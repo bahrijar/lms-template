@@ -39,8 +39,8 @@ const formSchema = z
       })
       .regex(/[0-9]/, { message: "Password must contain at least one number" }),
     confirmPassword: z.string(),
-    termsAndConditions: z.literal(true, {
-      errorMap: () => ({ message: "You must accept the terms and conditions" }),
+    termsAndConditions: z.boolean().refine((val) => val === true, {
+      message: "You must accept the terms and conditions",
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -210,9 +210,14 @@ export default function SignUpPage() {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="termsAndConditions"
-                checked={form.watch("termsAndConditions")}
+                checked={form.watch("termsAndConditions") as boolean}
                 onCheckedChange={(checked) => {
-                  form.setValue("termsAndConditions", checked as boolean);
+                  if (checked === true) {
+                    form.setValue("termsAndConditions", true);
+                  }
+                  if (checked === false) {
+                    form.setValue("termsAndConditions", false);
+                  }
                 }}
               />
               <label
